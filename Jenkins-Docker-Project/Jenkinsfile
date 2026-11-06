@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER = 'C:\\Users\\SWETA\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -10,21 +14,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t jenkins-docker-app .'
+                bat '"%DOCKER%" build -t jenkins-docker-app .'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'docker run --rm jenkins-docker-app python -m pytest -v'
+                bat '"%DOCKER%" run --rm jenkins-docker-app python -m pytest -v'
             }
         }
 
         stage('Deploy Container') {
             steps {
                 bat '''
-                docker rm -f jenkins-docker-container
-                docker run -d -p 5000:5000 --name jenkins-docker-container jenkins-docker-app
+                "%DOCKER%" rm -f jenkins-docker-container
+                "%DOCKER%" run -d -p 5000:5000 --name jenkins-docker-container jenkins-docker-app
                 '''
             }
         }
